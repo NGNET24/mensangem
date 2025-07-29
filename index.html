@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mensagem do Céu</title>
+<style>
+  body {
+    font-family: 'Georgia', serif;
+    margin: 0; padding: 0;
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80') no-repeat center center fixed;
+    background-size: cover;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: rgba(255,255,255,0.85);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  header h1 {
+    margin: 0;
+  }
+  nav {
+    background: rgba(255,255,255,0.9);
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  nav button {
+    background: none;
+    border: none;
+    padding: 15px 25px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+    color: #2c3e50;
+    font-weight: bold;
+  }
+  nav button:hover {
+    background-color: #2e86de;
+    color: white;
+  }
+  nav button.active {
+    background-color: #1b4f72;
+    color: white;
+  }
+  main {
+    flex: 1;
+    padding: 30px 20px;
+    background: rgba(255,255,255,0.92);
+    max-width: 600px;
+    margin: 20px auto;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+  section {
+    display: none;
+  }
+  section.active {
+    display: block;
+  }
+  input[type="text"], textarea {
+    width: 90%;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    resize: vertical;
+  }
+  button.action-btn {
+    background-color: #2e86de;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  button.action-btn:hover {
+    background-color: #1b4f72;
+  }
+  #resposta, #reflexao, #pedidoMsg, #versiculoAleatorioResposta, #secretoMsg {
+    margin-top: 15px;
+    font-style: italic;
+    color: #2c3e50;
+    min-height: 48px;
+  }
+  #versiculoSecreto {
+    color: #2e86de;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Mensagem do Céu</h1>
+  <p><em>"O Senhor é o meu pastor; nada me faltará." – Salmo 23:1</em></p>
+</header>
+
+<nav>
+  <button class="tab-btn active" data-tab="tab1">Versículo & Sentimento</button>
+  <button class="tab-btn" data-tab="tab2">Versículo Aleatório</button>
+  <button class="tab-btn" data-tab="tab3">Pedido de Oração</button>
+  <button class="tab-btn" data-tab="tab4">Versículo Secreto</button>
+</nav>
+
+<main>
+  <section id="tab1" class="active">
+    <h2>Como você se sente hoje?</h2>
+    <form id="sentimentoForm">
+      <input type="text" id="sentimentoInput" placeholder="Ex: triste, ansioso, medo..." required />
+      <br />
+      <button type="submit" class="action-btn">Receber mensagem de conforto</button>
+    </form>
+    <div id="resposta"></div>
+  </section>
+
+  <section id="tab2">
+    <h2>Quer mais uma Palavra?</h2>
+    <button id="versiculoAleatorioBtn" class="action-btn">Quero mais uma Palavra</button>
+    <div id="versiculoAleatorioResposta"></div>
+  </section>
+
+  <section id="tab3">
+    <h2>Pedido de Oração</h2>
+    <button id="abrirForm" class="action-btn">Enviar Pedido de Oração</button>
+    <div id="pedidoMsg"></div>
+  </section>
+
+  <section id="tab4">
+    <h2>Versículo Secreto</h2>
+    <div id="versiculoSecreto" title="Clique para revelar o versículo secreto!">Clique aqui para descobrir o versículo secreto</div>
+    <div id="secretoMsg"></div>
+  </section>
+</main>
+
+<script>
+  // Abas
+  const tabs = document.querySelectorAll('.tab-btn');
+  const sections = document.querySelectorAll('main section');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const target = tab.getAttribute('data-tab');
+      sections.forEach(sec => {
+        sec.id === target ? sec.classList.add('active') : sec.classList.remove('active');
+      });
+    });
+  });
+
+  // Mensagens de conforto inteligentes
+  function normalizarTexto(texto) {
+    return texto.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // remove acentos
+      .replace(/[^\w\s]/g, '') // remove pontuação
+      .trim();
+  }
+
+  const mensagensConforto = [
+    {
+      palavrasChave: ['triste', 'tristeza', 'chateado', 'deprimido', 'melancolia'],
+      mensagem: 'Sei que a tristeza aperta, mas lembre-se que Deus está contigo em todos os momentos.'
+    },
+    {
+      palavrasChave: ['ansioso', 'ansiedade', 'preocupado', 'nervoso', 'angustiado'],
+      mensagem: 'Deixe suas preocupações nas mãos de Deus e encontre paz no seu amor.'
+    },
+    {
+      palavrasChave: ['medo', 'receio', 'temor', 'assustado', 'apavorado'],
+      mensagem: 'Não temas, pois Deus é tua fortaleza e teu refúgio seguro.'
+    },
+    {
+      palavrasChave: ['sozinho', 'solidao', 'abandono', 'isolado', 'desamparado'],
+      mensagem: 'Você nunca está sozinho. Deus caminha sempre ao seu lado.'
+    }
+  ];
+
+  function buscarMensagemConforto(frase) {
+    const texto = normalizarTexto(frase);
+
+    for (const grupo of mensagensConforto) {
+      for (const palavra of grupo.palavrasChave) {
+        if (texto.includes(palavra)) {
+          return grupo.mensagem;
+        }
+      }
+    }
+    return 'Mesmo que você não saiba as palavras, Deus entende seu coração e está sempre contigo.';
+  }
+
+  // Elementos do Sentimento
+  const formSentimento = document.getElementById("sentimentoForm");
+  const inputSentimento = document.getElementById("sentimentoInput");
+  const respostaDiv = document.getElementById("resposta");
+
+  formSentimento.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const sentimento = inputSentimento.value.trim();
+    if (sentimento.length === 0) {
+      respostaDiv.textContent = "Por favor, digite como você se sente.";
+      return;
+    }
+    const mensagem = buscarMensagemConforto(sentimento);
+    respostaDiv.textContent = mensagem;
+    inputSentimento.value = "";
+  });
+
+  // Versículos aleatórios
+  const versiculosAleatorios = [
+    { versiculo: "“Tudo posso naquele que me fortalece.” – Filipenses 4:13", reflexao: "Com Cristo, você pode superar qualquer desafio." },
+    { versiculo: "“O Senhor é minha luz e minha salvação; a quem temerei?” – Salmo 27:1", reflexao: "Deus é sua proteção e guia." },
+    { versiculo: "“Confia no Senhor de todo o teu coração.” – Provérbios 3:5", reflexao: "Entregue seu caminho a Deus com confiança." },
+    { versiculo: "“Bem-aventurados os misericordiosos, porque alcançarão misericórdia.” – Mateus 5:7", reflexao: "Seja uma fonte de bondade ao seu redor." },
+    { versiculo: "“Alegrai-vos sempre no Senhor.” – Filipenses 4:4", reflexao: "Encontre alegria e paz em Deus diariamente." }
+  ];
+
+  const versiculoAleatorioBtn = document.getElementById("versiculoAleatorioBtn");
+  const versiculoAleatorioResposta = document.getElementById("versiculoAleatorioResposta");
+
+  versiculoAleatorioBtn.addEventListener("click", function() {
+    const index = Math.floor(Math.random() * versiculosAleatorios.length);
+    const item = versiculosAleatorios[index];
+    versiculoAleatorioResposta.textContent = item.versiculo + (item.reflexao ? ("\n" + item.reflexao) : "");
+  });
+
+  // Pedido de oração
+  const abrirFormBtn = document.getElementById('abrirForm');
+  const pedidoMsg = document.getElementById('pedidoMsg');
+
+  abrirFormBtn.addEventListener('click', () => {
+    const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLScee2twf7_x3GFnPSP7sKlttIFPhHQEI56k_lTCX4X4yTa3jg/viewform?usp=dialog';
+    window.open(formUrl, '_blank');
+    pedidoMsg.textContent = 'Abrindo formulário de pedido de oração...';
+  });
+
+  // Versículo Secreto
+  const versiculoSecreto = "“Porque sou eu que conheço os planos que tenho para vocês, diz o Senhor.” – Jeremias 29:11";
+
+  const versiculoSecretoDiv = document.getElementById("versiculoSecreto");
+  const secretoMsg = document.getElementById("secretoMsg");
+
+  versiculoSecretoDiv.addEventListener("click", function() {
+    secretoMsg.textContent = versiculoSecreto;
+  });
+</script>
+
+</body>
+</html>
